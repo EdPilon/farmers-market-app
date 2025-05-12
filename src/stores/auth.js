@@ -27,7 +27,7 @@ export const useAuthStore = defineStore('auth', {
   },
   
   actions: {
-    async registerUser({ email, password, name, role = 'customer' }) {
+    async registerUser({ email, password, name, roles }) {
       this.loading = true;
       this.error = null;
       
@@ -42,10 +42,8 @@ export const useAuthStore = defineStore('auth', {
         const userProfile = {
           name,
           email,
-          role,
+          roles, // Store roles as an array
           createdAt: new Date().toISOString(),
-          favoriteVendors: [],
-          favoriteProducts: []
         };
         
         await setDoc(doc(db, 'userProfiles', userCredential.user.uid), userProfile);

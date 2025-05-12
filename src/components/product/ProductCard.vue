@@ -1,20 +1,18 @@
 <template>
-  <div class="product-card bg-white rounded-lg shadow-md overflow-hidden hover:shadow-lg transition-shadow duration-300">
-    <img 
-      :src="product.imageUrl || '/assets/images/product-placeholder.jpg'" 
-      :alt="product.name" 
-      class="w-full h-48 object-cover"
-    />
-    <div class="p-4">
-      <h3 class="text-lg font-semibold text-gray-800 truncate">{{ product.name }}</h3>
-      <p class="text-sm text-gray-600 mt-2 truncate">${{ product.price.toFixed(2) }}</p>
-      <router-link 
-        :to="`/products/${product.id}`" 
-        class="mt-4 inline-block bg-green-500 hover:bg-green-600 text-white text-sm font-medium py-2 px-4 rounded-md transition-colors"
-      >
-        View Details
-      </router-link>
-    </div>
+  <div class="product-card rounded-lg shadow-md hover:shadow-lg transition-shadow duration-300 p-3 border-b border-gray-300">
+    <!-- Product Name -->
+    <h3 class="text-base font-semibold text-gray-800">{{ product.name }}</h3>
+
+    <!-- Product Price -->
+    <p class="text-sm text-gray-600 mt-2">${{ product.price.toFixed(2) }}</p>
+
+    <!-- Action Button -->
+    <router-link 
+      :to="`/products/${product.id}`" 
+      class="mt-3 inline-block text-sm font-medium text-green-600 hover:text-green-700"
+    >
+      View Details
+    </router-link>
   </div>
 </template>
 

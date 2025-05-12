@@ -68,16 +68,16 @@ export const useProductsStore = defineStore('products', {
       try {
         const productRef = doc(db, 'products', id);
         const productDoc = await getDoc(productRef);
-        
+
         if (productDoc.exists()) {
           this.currentProduct = {
             id: productDoc.id,
             ...productDoc.data()
           };
-          
+
           // Add to recently viewed
           this.addToRecentlyViewed(id);
-          
+
           // Fetch related products
           await this.fetchRelatedProducts(this.currentProduct.category, this.currentProduct.vendorId);
         } else {

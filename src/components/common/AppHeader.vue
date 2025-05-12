@@ -1,14 +1,17 @@
 <template>
-  <header class="app-header bg-green-500 text-white py-4 px-6">
-    <div class="container mx-auto flex justify-between items-center">
-      <h1 class="text-xl font-bold">
-        <router-link to="/" class="hover:underline">Farmers Market</router-link>
+  <header class="app-header bg-success text-white py-3 fixed-top">
+    <div class="container d-flex justify-content-between align-items-center">
+      <h1 class="h3 mb-0">
+        <router-link to="/" class="text-white text-decoration-none">Farmers Market</router-link>
       </h1>
       <nav>
-        <ul class="flex space-x-4">
-          <li><router-link to="/vendors" class="hover:underline">Vendors</router-link></li>
-          <li><router-link to="/recipes" class="hover:underline">Recipes</router-link></li>
-          <li><router-link to="/account" class="hover:underline">My Account</router-link></li>
+        <ul class="nav">
+          <li class="nav-item">
+            <router-link to="/vendors" class="nav-link text-white">Vendors</router-link>
+          </li>
+          <li class="nav-item">
+            <router-link to="/account" class="nav-link text-white">My Account</router-link>
+          </li>
         </ul>
       </nav>
     </div>
@@ -17,6 +20,13 @@
 
 <style scoped>
 .app-header {
-  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+  box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1); /* Subtle shadow for depth */
+  width: 100%; /* Full width */
+  position: sticky; /* Sticks to the top */
+  top: 0; /* Ensures it stays at the top */
+  z-index: 1030; /* Ensures it stays above other elements */
+}
+.nav-link:hover {
+  color: #d4edda; /* Light green hover effect */
 }
 </style>

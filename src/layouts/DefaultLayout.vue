@@ -1,5 +1,5 @@
 <template>
-  <div class="default-layout">
+  <div class="default-layout bg-eggshell">
     <AppHeader />
     <main class="container mx-auto py-6">
       <router-view />

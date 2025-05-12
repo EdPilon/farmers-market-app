@@ -1,10 +1,12 @@
 <template>
   <div class="vendor-list grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-6">
-    <VendorCard 
+    <div 
       v-for="vendor in vendors" 
       :key="vendor.id" 
-      :vendor="vendor" 
-    />
+      class="border-b border-gray-300 pb-4"
+    >
+      <VendorCard :vendor="vendor" />
+    </div>
   </div>
 </template>
 

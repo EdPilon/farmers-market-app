@@ -6,7 +6,7 @@
     </p>
     <router-link 
       to="/vendors" 
-      class="bg-green-500 hover:bg-green-600 text-white py-3 px-6 rounded-lg text-lg font-medium"
+      class="bg-green-500 hover:bg-green-600 text-black py-3 px-6 rounded-lg text-lg font-medium"
     >
       Browse Vendors
     </router-link>

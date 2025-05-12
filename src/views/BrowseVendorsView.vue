@@ -7,4 +7,12 @@
 
 <script setup>
 import VendorList from '@/components/vendor/VendorList.vue';
+import { onMounted } from 'vue';
+import { useVendorsStore } from '@/stores/vendors';
+
+const vendorsStore = useVendorsStore();
+
+onMounted(() => {
+  vendorsStore.fetchVendors(); // Ensure this is called
+});
 </script>

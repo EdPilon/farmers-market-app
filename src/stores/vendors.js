@@ -37,13 +37,36 @@ export const useVendorsStore = defineStore('vendors', {
       try {
         const vendorsCollection = collection(db, 'vendors');
         const vendorSnapshot = await getDocs(vendorsCollection);
-        this.vendors = vendorSnapshot.docs.map(doc => ({
-          id: doc.id,
-          ...doc.data()
-        }));
+
+        // Resolve product references for each vendor
+        const vendorPromises = vendorSnapshot.docs.map(async (docSnapshot) => {
+          const vendorData = docSnapshot.data();
+
+          // Ensure products is an array of strings (product IDs)
+          if (!Array.isArray(vendorData.products)) {
+            console.warn(`Vendor ${docSnapshot.id} has an invalid products field.`);
+            vendorData.products = [];
+          }
+
+          const productPromises = vendorData.products.map(async (productId) => {
+            const productRef = doc(db, 'products', productId);
+            const productDoc = await getDoc(productRef);
+            return productDoc.exists() ? { id: productDoc.id, ...productDoc.data() } : null;
+          });
+
+          const products = (await Promise.all(productPromises)).filter(product => product !== null);
+
+          return {
+            id: docSnapshot.id,
+            ...vendorData,
+            products, // Replace product IDs with actual product data
+          };
+        });
+
+        this.vendors = await Promise.all(vendorPromises);
       } catch (error) {
+        console.error('Error fetching vendors:', error.message);
         this.error = error.message;
-        console.error('Error fetching vendors:', error);
       } finally {
         this.loading = false;
       }
@@ -54,11 +77,23 @@ export const useVendorsStore = defineStore('vendors', {
       try {
         const vendorRef = doc(db, 'vendors', id);
         const vendorDoc = await getDoc(vendorRef);
-        
+
         if (vendorDoc.exists()) {
+          const vendorData = vendorDoc.data();
+
+          // Resolve product IDs to actual product documents
+          const productPromises = vendorData.products.map(async (productId) => {
+            const productRef = doc(db, 'products', productId);
+            const productDoc = await getDoc(productRef);
+            return productDoc.exists() ? { id: productDoc.id, ...productDoc.data() } : null;
+          });
+
+          const products = (await Promise.all(productPromises)).filter(product => product !== null);
+
           this.currentVendor = {
             id: vendorDoc.id,
-            ...vendorDoc.data()
+            ...vendorData,
+            products, // Replace product IDs with actual product data
           };
         } else {
           throw new Error('Vendor not found');
