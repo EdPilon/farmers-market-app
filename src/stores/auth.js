@@ -60,6 +60,51 @@ export const useAuthStore = defineStore('auth', {
         this.loading = false;
       }
     },
+
+    async registerVendor({ name, contact, location, password }) {
+      this.loading = true;
+      this.error = null;
+
+      try {
+        // Create user in Firebase Auth
+        const userCredential = await createUserWithEmailAndPassword(auth, contact, password);
+
+        // Update profile with name
+        await updateProfile(userCredential.user, { displayName: name });
+
+        // Create vendor profile in Firestore
+        const vendorProfile = {
+          name,
+          contact,
+          location,
+          products: [], // Initialize with an empty products array
+        };
+
+        await setDoc(doc(db, 'vendors', userCredential.user.uid), vendorProfile);
+
+        // Set user state
+        this.user = userCredential.user;
+        this.userProfile = vendorProfile;
+
+        return userCredential.user;
+      } catch (error) {
+        console.error('Error during vendor registration:', error.message);
+
+        // Clean up Firebase Authentication account if Firestore write fails
+        if (error.code === 'permission-denied' || error.code === 'unavailable') {
+          console.warn('Cleaning up partially created account...');
+          const currentUser = auth.currentUser;
+          if (currentUser) {
+            await currentUser.delete();
+          }
+        }
+
+        this.error = error.message;
+        throw error;
+      } finally {
+        this.loading = false;
+      }
+    },
     
     async loginUser({ email, password }) {
       this.loading = true;
@@ -80,6 +125,31 @@ export const useAuthStore = defineStore('auth', {
         this.loading = false;
       }
     },
+
+    async loginVendor({ email, password }) {
+      this.loading = true;
+      this.error = null;
+
+      try {
+        // Log in the user
+        const userCredential = await signInWithEmailAndPassword(auth, email, password);
+        this.user = userCredential.user;
+
+        // Fetch vendor profile
+        const vendorDoc = await getDoc(doc(db, 'vendors', userCredential.user.uid));
+        if (!vendorDoc.exists()) {
+          throw new Error('This account is not registered as a vendor.');
+        }
+
+        this.userProfile = vendorDoc.data();
+        return userCredential.user;
+      } catch (error) {
+        this.error = error.message;
+        throw error;
+      } finally {
+        this.loading = false;
+      }
+    },
     
     async logoutUser() {
       this.loading = true;
@@ -89,6 +159,7 @@ export const useAuthStore = defineStore('auth', {
         this.user = null;
         this.userProfile = null;
       } catch (error) {
+        console.error('Error logging out:', error);
         this.error = error.message;
         throw error;
       } finally {
@@ -126,11 +197,23 @@ export const useAuthStore = defineStore('auth', {
     },
     
     initAuthListener() {
-      return onAuthStateChanged(auth, async (user) => {
+      onAuthStateChanged(auth, async (user) => {
         this.user = user;
-        
+
         if (user) {
-          await this.fetchUserProfile(user.uid);
+          try {
+            // Fetch vendor profile
+            const vendorDoc = await getDoc(doc(db, 'vendors', user.uid));
+            if (vendorDoc.exists()) {
+              this.userProfile = vendorDoc.data();
+            } else {
+              console.warn('Vendor profile not found.');
+              this.userProfile = null;
+            }
+          } catch (error) {
+            console.error('Error fetching vendor profile:', error);
+            this.error = error.message;
+          }
         } else {
           this.userProfile = null;
         }

@@ -1,6 +1,6 @@
 <template>
   <div class="login-view container mx-auto py-6">
-    <h1 class="text-2xl font-bold mb-4">Login</h1>
+    <h1 class="text-2xl font-bold mb-4">Vendor Login</h1>
     <form @submit.prevent="login">
       <div class="mb-4">
         <label for="email" class="block text-sm font-medium text-gray-700">Email</label>
@@ -35,18 +35,21 @@
 <script setup>
 import { ref } from 'vue';
 import { useAuthStore } from '@/stores/auth';
+import { useRouter } from 'vue-router';
 
 const authStore = useAuthStore();
+const router = useRouter();
 const email = ref('');
 const password = ref('');
 
 const login = async () => {
   try {
-    await authStore.loginUser({ email: email.value, password: password.value });
+    await authStore.loginVendor({ email: email.value, password: password.value });
     alert('Login successful!');
+    router.push('/'); // Redirect to home page
   } catch (error) {
     console.error('Error logging in:', error);
-    alert('Failed to login. Please try again.');
+    alert('Failed to login. Please ensure you are a registered vendor.');
   }
 };
 </script>
