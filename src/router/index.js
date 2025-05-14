@@ -8,6 +8,7 @@ import AccountView from '@/views/AccountView.vue';
 import PickupScheduleView from '@/views/PickupScheduleView.vue';
 import AccountCreationView from '@/views/AccountCreationView.vue';
 import LoginView from '@/views/LoginView.vue';
+import ManageProductsView from '@/views/ManageProductsView.vue';
 
 const routes = [
   {
@@ -21,6 +22,8 @@ const routes = [
       { path: 'pickup-schedule', name: 'PickupSchedule', component: PickupScheduleView },
       { path: '/create-account', name: 'AccountCreation', component: AccountCreationView },
       { path: '/login', name: 'Login', component: LoginView },
+      { path: '/vendor-dashboard', name: 'VendorDashboard', component: VendorDashboardView },
+      { path: '/manage-products', name: 'ManageProducts', component: ManageProductsView },
     ],
   },
 ];
