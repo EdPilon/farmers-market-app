@@ -7,7 +7,10 @@ import {
   query, 
   where, 
   onSnapshot,
-  limit 
+  limit,
+  addDoc,
+  updateDoc,
+  deleteDoc
 } from 'firebase/firestore';
 import { db } from '@/config/firebase';
 
@@ -178,6 +181,68 @@ export const useProductsStore = defineStore('products', {
       if (saved) {
         this.recentlyViewed = JSON.parse(saved);
       }
-    }
-  }
+    },
+
+    async fetchProductsByVendor(vendorID) {
+      this.loading = true;
+      try {
+        const productsQuery = query(collection(db, 'products'), where('vendorID', '==', vendorID));
+        const productSnapshot = await getDocs(productsQuery);
+        this.products = productSnapshot.docs.map(doc => ({ id: doc.id, ...doc.data() }));
+      } catch (error) {
+        console.error('Error fetching products:', error);
+        this.error = error.message;
+      } finally {
+        this.loading = false;
+      }
+    },
+
+    async addProduct(product) {
+      this.loading = true;
+      try {
+        const productRef = await addDoc(collection(db, 'products'), {
+          name: product.name,
+          price: product.price,
+          category: product.category,
+          vendorId: product.vendorId,
+        });
+        alert('Product added successfully!');
+        return productRef.id;
+      } catch (error) {
+        console.error('Error adding product:', error);
+        this.error = error.message;
+        throw error;
+      } finally {
+        this.loading = false;
+      }
+    },
+
+    async updateProduct(productID, updatedData) {
+      this.loading = true;
+      try {
+        const productRef = doc(db, 'products', productID);
+        await updateDoc(productRef, updatedData);
+        alert('Product updated successfully!');
+      } catch (error) {
+        console.error('Error updating product:', error);
+        this.error = error.message;
+      } finally {
+        this.loading = false;
+      }
+    },
+
+    async removeProduct(productID) {
+      this.loading = true;
+      try {
+        const productRef = doc(db, 'products', productID);
+        await deleteDoc(productRef);
+        alert('Product removed successfully!');
+      } catch (error) {
+        console.error('Error removing product:', error);
+        this.error = error.message;
+      } finally {
+        this.loading = false;
+      }
+    },
+  },
 });

@@ -12,11 +12,23 @@
           <li class="nav-item">
             <router-link to="/account" class="nav-link text-white">My Account</router-link>
           </li>
+          <li v-if="isLoggedIn" class="nav-item">
+            <span class="nav-link text-white">Logged in as {{ userName }}</span>
+          </li>
         </ul>
       </nav>
     </div>
   </header>
 </template>
+
+<script setup>
+import { computed } from 'vue';
+import { useAuthStore } from '@/stores/auth';
+
+const authStore = useAuthStore();
+const isLoggedIn = computed(() => authStore.isAuthenticated);
+const userName = computed(() => authStore.user?.displayName || 'User');
+</script>
 
 <style scoped>
 .app-header {

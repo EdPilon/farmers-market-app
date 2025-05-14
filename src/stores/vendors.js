@@ -6,7 +6,9 @@ import {
   getDoc, 
   query, 
   where, 
-  onSnapshot 
+  onSnapshot, 
+  updateDoc, 
+  arrayUnion 
 } from 'firebase/firestore';
 import { db } from '@/config/firebase';
 
@@ -134,6 +136,25 @@ export const useVendorsStore = defineStore('vendors', {
       if (saved) {
         this.favoriteVendors = JSON.parse(saved);
       }
-    }
+    },
+
+    async addProductToVendor(vendorId, productId) {
+      try {
+        const vendorRef = doc(db, 'vendors', vendorId);
+
+        // Ensure the `products` field is initialized as an array
+        const vendorDoc = await getDoc(vendorRef);
+        if (vendorDoc.exists() && !Array.isArray(vendorDoc.data().products)) {
+          await updateDoc(vendorRef, { products: [] });
+        }
+
+        // Add the product ID to the `products` array
+        await updateDoc(vendorRef, {
+          products: arrayUnion(productId),
+        });
+      } catch (error) {
+        console.error('Error adding product to vendor:', error);
+      }
+    },
   }
 });
